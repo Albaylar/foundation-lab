@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'design/components/quiz_result_card.dart';
 import 'design/tokens.dart';
 
 void main() {
@@ -22,8 +23,15 @@ class MainApp extends StatelessWidget {
   }
 } // ← MainApp burada biter
 
-class TokenPreviewPage extends StatelessWidget {
+class TokenPreviewPage extends StatefulWidget {
   const TokenPreviewPage({super.key});
+
+  @override
+  State<TokenPreviewPage> createState() => _TokenPreviewPageState();
+}
+
+class _TokenPreviewPageState extends State<TokenPreviewPage> {
+  int _attempt = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +39,7 @@ class TokenPreviewPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: t.colors.surface,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(t.spacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +57,12 @@ class TokenPreviewPage extends StatelessWidget {
                 ],
               ),
               SizedBox(height: t.spacing.xl),
-              // TODO 3: spacing çubukları buraya gelecek
+              QuizResultCard(
+                score: 8,
+                total: 10,
+                message: 'Great job! Keep it up (attempt $_attempt).',
+                onTryAgain: () => setState(() => _attempt++),
+              ),
             ],
           ),
         ),

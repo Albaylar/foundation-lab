@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__design-system__check_design_rules",
+      "Bash(flutter analyze *)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "design-system"
+  ]
+}

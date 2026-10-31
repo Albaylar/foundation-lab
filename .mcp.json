@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "design-system": {
+      "type": "stdio",
+      "command": "/Users/furkandenizalbaylar/Developer/foundation-lab/mcp/bin/ds-mcp",
+      "args": [
+        "--root",
+        "/Users/furkandenizalbaylar/Developer/foundation-lab"
+      ],
+      "env": {}
+    }
+  }
+}
