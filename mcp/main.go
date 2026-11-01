@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -114,15 +115,15 @@ var rules = []struct {
 	{"hardcoded radius, use context.tokens.radius", regexp.MustCompile(`BorderRadius\.circular\(\s*\d`)},
 }
 
-func checkDesignRules(ctx context.Context, req *mcp.CallToolRequest, in CheckIn) (*mcp.CallToolResult, CheckOut, error) {
-	path := filepath.Join(root, in.Path)
-	// Güvenlik: agent'ın repo dışındaki dosyaları okumasını engelle.
+// Hem MCP tool'u hem CLI modu bu fonksiyonu kullanır.
+func checkFile(rel string) (CheckOut, error) {
+	path := filepath.Join(root, rel)
 	if !strings.HasPrefix(path, root+string(os.PathSeparator)) {
-		return nil, CheckOut{}, fmt.Errorf("path must be inside the repo")
+		return CheckOut{}, fmt.Errorf("path must be inside the repo")
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, CheckOut{}, err
+		return CheckOut{}, err
 	}
 	out := CheckOut{Violations: []Violation{}}
 	for i, line := range strings.Split(string(data), "\n") {
@@ -133,19 +134,40 @@ func checkDesignRules(ctx context.Context, req *mcp.CallToolRequest, in CheckIn)
 		}
 	}
 	out.OK = len(out.Violations) == 0
-	return nil, out, nil
+	return out, nil
+}
+
+func checkDesignRules(ctx context.Context, req *mcp.CallToolRequest, in CheckIn) (*mcp.CallToolResult, CheckOut, error) {
+	out, err := checkFile(in.Path)
+	return nil, out, err
 }
 
 // ---------- main ----------
 
 func main() {
+	var checkPath string
 	flag.StringVar(&root, "root", ".", "path to the foundation-lab repo root")
+	flag.StringVar(&checkPath, "check", "", "check one Dart file and exit (CLI mode)")
 	flag.Parse()
 	abs, err := filepath.Abs(root)
 	if err != nil {
 		log.Fatal(err)
 	}
 	root = abs
+
+	// CLI modu: server başlatma, dosyayı kontrol et ve çık.
+	if checkPath != "" {
+		out, err := checkFile(checkPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		b, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(b))
+		if !out.OK {
+			os.Exit(1)
+		}
+		return
+	}
 
 	server := mcp.NewServer(&mcp.Implementation{Name: "design-system", Version: "v0.1.0"}, nil)
 
