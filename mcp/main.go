@@ -122,6 +122,11 @@ func checkFile(rel string) (CheckOut, error) {
 	if !strings.HasPrefix(path, root+string(os.PathSeparator)) {
 		return CheckOut{}, fmt.Errorf("path must be inside the repo")
 	}
+
+	// tokens.dart değerlerin tanımlandığı tek yer: kuralların istisnası.
+	if filepath.ToSlash(filepath.Clean(rel)) == "app/lib/design/tokens.dart" {
+		return CheckOut{OK: true, Violations: []Violation{}}, nil
+	}
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return CheckOut{}, err
