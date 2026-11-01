@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  flutter:
+    name: Flutter analyze & test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.2
+          channel: stable
+          cache: true          # Flutter SDK'yı cache'ler, her seferinde indirmez
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: if [ -d test ]; then flutter test; else echo "no tests yet"; fi
+
+  go:
+    name: MCP server & design rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: mcp/go.mod
+          cache-dependency-path: mcp/go.sum   # Go modüllerini cache'ler
+
+      - name: Build & test MCP server
+        working-directory: mcp
+        run: |
+          go vet ./...
+          go test ./...
+          go build -o bin/ds-mcp .
+
+      - name: Check design rules on all Dart files
+        run: |
+          fail=0
+          for f in $(git ls-files 'app/lib/*.dart'); do
+            ./mcp/bin/ds-mcp --root . --check "$f" > /dev/null || { echo "❌ $f"; ./mcp/bin/ds-mcp --root . --check "$f"; fail=1; }
+          done
+          exit $fail
