@@ -9,6 +9,7 @@ Flutter app (app/) + Go MCP server (mcp/) + evals (evals/).
   via `context.tokens`.
 - Use shared components from `lib/design/components/` before writing new widgets.
 - Prefer `const` constructors.
+- Never use deprecated `withOpacity`. Use `.withValues(alpha: x)` or an existing color token.
 
 ## Commands
 - `cd app && flutter analyze && flutter test`

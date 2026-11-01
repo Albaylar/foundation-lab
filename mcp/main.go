@@ -112,6 +112,7 @@ var rules = []struct {
 }{
 	{"hardcoded color, use context.tokens.colors", regexp.MustCompile(`Color\(0x|Colors\.[a-z]`)},
 	{"hardcoded spacing, use context.tokens.spacing", regexp.MustCompile(`EdgeInsets\.\w+\((\s*\d|[^)]*:\s*\d)|SizedBox\([^)]*(height|width):\s*\d`)},
+	{"deprecated API, use .withValues(alpha: x) instead of withOpacity", regexp.MustCompile(`\.withOpacity\(`)},
 	{"hardcoded radius, use context.tokens.radius", regexp.MustCompile(`BorderRadius\.circular\(\s*\d`)},
 }
 

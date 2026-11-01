@@ -1,0 +1,9 @@
+condition,task,design_ok,uses_knowbutton,analyze_ok
+baseline,streak_badge,1,0,0
+baseline,flashcard,1,1,0
+baseline,subject_tile,1,1,0
+baseline,empty_state,1,1,0
+mcp,streak_badge,1,0,0
+mcp,flashcard,1,1,1
+mcp,subject_tile,1,1,1
+mcp,empty_state,1,1,1
